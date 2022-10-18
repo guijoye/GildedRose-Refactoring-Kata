@@ -72,9 +72,60 @@ namespace GildedRoseTests
         }
 
         [Theory]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 0, 10)]
+        public void UpdateQuality_ForBackstagePassesAfterSellDate_QualityDecrease(string ItemName, int SellIn, int Quality)
+        {
+            IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
+            GildedRose app = new(Items);
+            app.UpdateQuality();
+            Assert.True(Items[0].Quality < Quality);
+        }
+
+        [Theory]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 50, 10)]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 30, 10)]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 20, 10)]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 11, 10)]
+        public void UpdateQuality_ForBackstagePasses10DaysOrMore_QualityIncreaseBy1(string ItemName, int SellIn, int Quality)
+        {
+            IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
+            GildedRose app = new(Items);
+            app.UpdateQuality();
+            Assert.Equal(Quality + 1, Items[0].Quality);
+        }
+
+        [Theory]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 10, 10)]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 9, 10)]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 8, 10)]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 7, 10)]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 6, 10)]
+        public void UpdateQuality_ForBackstagePassesBetween10And6_QualityIncreaseBy2(string ItemName, int SellIn, int Quality)
+        {
+            IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
+            GildedRose app = new(Items);
+            app.UpdateQuality();
+            Assert.Equal(Quality + 2, Items[0].Quality);
+        }
+
+        [Theory]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 5, 10)]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 4, 10)]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 3, 10)]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 2, 10)]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 1, 10)]
+        public void UpdateQuality_ForBackstagePassesBetween5And1_QualityIncreaseBy3(string ItemName, int SellIn, int Quality)
+        {
+            IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
+            GildedRose app = new(Items);
+            app.UpdateQuality();
+            Assert.Equal(Quality + 3, Items[0].Quality);
+        }
+
+        [Theory]
         [InlineData("Aged Brie", 10, 49, 100)]
         [InlineData("Backstage passes to a TAFKAL80ETC concert", 10, 49, 10)]
-        public void UpdateQuality_UpdateManyTimes_QualityIsNeverAbove50ForBrieOrBackstage(string ItemName, int SellIn, int Quality, int Iterations)
+        public void UpdateQuality_UpdateManyTimes_QualityIsNeverAbove50(string ItemName, int SellIn, int Quality, int Iterations)
         {
             IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
             GildedRose app = new(Items);
