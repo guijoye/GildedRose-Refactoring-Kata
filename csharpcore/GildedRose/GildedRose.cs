@@ -13,6 +13,13 @@ namespace GildedRoseKata
         {
             this.Items = Items;
         }
+        public bool ProcessSulfurasItem(Item item)
+        {
+            if (item.Name != SulfurasItemName)
+                return false;
+
+            return true;
+        }
 
         public bool ProcessBrieItem(Item item)
         {
@@ -79,12 +86,32 @@ namespace GildedRoseKata
             return true;
         }
 
+        public bool ProcessClassicItem(Item item)
+        {
+            if (item.Quality > 0)
+            {
+                item.Quality = item.Quality - 1;
+            }
+
+            if (item.SellIn <= 0)
+            {
+                if (item.Quality > 0)
+                {
+                    item.Quality = item.Quality - 1;
+                }
+            }
+
+            item.SellIn = item.SellIn - 1;
+
+            return true;
+        }
+
 
         public void UpdateQuality()
         {
             foreach (var item in Items)
             {
-                if (item.Name.Equals(SulfurasItemName))
+                if (ProcessSulfurasItem(item))
                     continue;
 
                 if (ProcessBrieItem(item))
@@ -96,20 +123,7 @@ namespace GildedRoseKata
                 if (ProcessConjuredItem(item))
                     continue;
 
-                if (item.Quality > 0)
-                {
-                    item.Quality = item.Quality - 1;
-                }
-
-                if (item.SellIn <= 0)
-                {
-                    if (item.Quality > 0)
-                    {
-                        item.Quality = item.Quality - 1;
-                    }
-                }
-
-                item.SellIn = item.SellIn - 1;
+                ProcessClassicItem(item);
             }
         }
     }
