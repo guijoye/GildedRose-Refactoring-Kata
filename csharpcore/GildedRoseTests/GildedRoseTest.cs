@@ -149,12 +149,22 @@ namespace GildedRoseTests
 
         [Theory]
         [InlineData("Conjured", 10, 10)]
-        public void UpdateQuality_ForConjuredItems_QualityDecreaseTwice(string ItemName, int SellIn, int Quality)
+        public void UpdateQuality_ForConjuredItemsBeforeSellDate_QualityDecreaseTwice(string ItemName, int SellIn, int Quality)
         {
             IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
             GildedRose app = new(Items);
             app.UpdateQuality();
             Assert.Equal(Quality - 2, Items[0].Quality);
+        }
+
+        [Theory]
+        [InlineData("Conjured", 0, 10)]
+        public void UpdateQuality_ForConjuredItemsAfterSellDate_QualityDecreaseTwice(string ItemName, int SellIn, int Quality)
+        {
+            IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
+            GildedRose app = new(Items);
+            app.UpdateQuality();
+            Assert.Equal(Quality - 4, Items[0].Quality);
         }
     }
 }
