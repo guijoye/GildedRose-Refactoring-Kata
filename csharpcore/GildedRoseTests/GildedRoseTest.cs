@@ -74,7 +74,7 @@ namespace GildedRoseTests
         [Theory]
         [InlineData("Aged Brie", 10, 49, 100)]
         [InlineData("Backstage passes to a TAFKAL80ETC concert", 10, 49, 10)]
-        public void UpdateQuality_UpdateManyTimes_QualityIsNeverAbove50(string ItemName, int SellIn, int Quality, int Iterations)
+        public void UpdateQuality_UpdateManyTimes_QualityIsNeverAbove50ForBrieOrBackstage(string ItemName, int SellIn, int Quality, int Iterations)
         {
             IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
             GildedRose app = new(Items);
@@ -82,6 +82,18 @@ namespace GildedRoseTests
                 app.UpdateQuality();
             Assert.True(Items[0].Quality > Quality);
             Assert.Equal(50, Items[0].Quality);
+        }
+
+        [Theory]
+        [InlineData("Sulfuras, Hand of Ragnaros", 10, 80, 100)]
+        public void UpdateQuality_UpdateManyTimes_SulfurasUnaltered(string ItemName, int SellIn, int Quality, int Iterations)
+        {
+            IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
+            GildedRose app = new(Items);
+            for (int x = 0; x < Iterations; x++)
+                app.UpdateQuality();
+            Assert.Equal(SellIn, Items[0].SellIn);
+            Assert.Equal(Quality, Items[0].Quality);
         }
     }
 }
