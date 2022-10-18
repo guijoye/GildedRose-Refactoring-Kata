@@ -8,7 +8,7 @@ namespace GildedRoseTests
     {
         [Theory]
         [InlineData("ItemNameToTest", "ItemNameToTest")]
-        public void UpdateQuality_CheckItemName_IsTheSameAfterUpdate(string ItemName, string ExpectedNameAfterUpdate)
+        public void UpdateQuality_WhenUpdate_ItemNameIsUnaltered(string ItemName, string ExpectedNameAfterUpdate)
         {
             IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = 0, Quality = 0 } };
             GildedRose app = new(Items);
@@ -19,7 +19,7 @@ namespace GildedRoseTests
         [Theory]
         [InlineData("TestItem", 10, 10)]
         [InlineData("TestItem", 1, 10)]
-        public void UpdateQuality_QualityDegrade_IsOk(string ItemName, int SellIn, int Quality)
+        public void UpdateQuality_WhenUpdate_QualityDegrade(string ItemName, int SellIn, int Quality)
         {
             IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
             GildedRose app = new(Items);
@@ -30,7 +30,7 @@ namespace GildedRoseTests
         [Theory]
         [InlineData("TestItem", 0, 10)]
         [InlineData("TestItem", -5, 10)]
-        public void UpdateQuality_QualityDegradeTwiceAsFastWhenSellPassed_IsOk(string ItemName, int SellIn, int Quality)
+        public void UpdateQuality_WhenSellPassed_QualityDegradeTwiceAsFast(string ItemName, int SellIn, int Quality)
         {
             IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
             GildedRose app = new(Items);
@@ -146,5 +146,7 @@ namespace GildedRoseTests
             Assert.Equal(SellIn, Items[0].SellIn);
             Assert.Equal(Quality, Items[0].Quality);
         }
+
+
     }
 }
