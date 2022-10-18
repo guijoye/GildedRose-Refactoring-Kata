@@ -1,107 +1,92 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 
 namespace GildedRoseKata
 {
     public class GildedRose
     {
-        IList<Item> Items;
+        readonly IList<Item> Items;
         private const string AgedBrieItemName = "Aged Brie";
         private const string BackstagePassesItemName = "Backstage passes to a TAFKAL80ETC concert";
         private const string SulfurasItemName = "Sulfuras, Hand of Ragnaros";
         private const string ConjuredItemName = "Conjured";
+
         public GildedRose(IList<Item> Items)
         {
             this.Items = Items;
         }
-        public bool ProcessSulfurasItem(Item item)
+
+        private void DegradeItem(Item item, int degradeRatio)
         {
-            if (item.Name != SulfurasItemName)
-                return false;
+            int degradeValue = 1 * degradeRatio;
 
-            return true;
-        }
+            item.Quality -= degradeValue;
 
-        public bool ProcessBrieItem(Item item)
-        {
-            if (item.Name != AgedBrieItemName)
-                return false;
-
-            if (item.Quality < 50)
-                item.Quality = item.Quality + 1;
-
-            item.SellIn = item.SellIn - 1;
-
-            return true;
-        }
-
-        public bool ProcessBackstageItem(Item item)
-        {
-            if (item.Name != BackstagePassesItemName)
-                return false;
-
-            if (item.Quality < 50)
-            {
-                item.Quality = item.Quality + 1;
-
-                if (item.SellIn < 11)
-                {
-                    if (item.Quality < 50)
-                    {
-                        item.Quality = item.Quality + 1;
-                    }
-                }
-
-                if (item.SellIn < 6)
-                {
-                    if (item.Quality < 50)
-                    {
-                        item.Quality = item.Quality + 1;
-                    }
-                }
-            }
-
+            // Once the sell by date has passed, Quality degrades twice as fast
             if (item.SellIn <= 0)
-                item.Quality = item.Quality - item.Quality;
-
-            item.SellIn = item.SellIn - 1;
-
-            return true;
+                item.Quality -= degradeValue;
         }
 
-        public bool ProcessConjuredItem(Item item)
+        private void ProcessCommonRules(Item item)
         {
-            if (!item.Name.StartsWith(ConjuredItemName))
-                return false;
+            // The Quality of an item is never more than 50
+            if (item.Quality > 50)
+                item.Quality = 50;
 
-            if (item.SellIn > 0)
-                item.Quality = item.Quality - 2;
-            else
-                item.Quality = item.Quality - 4;
-
-            if (item.Quality < 0)
+            // The Quality of an item is never negative
+            if (item.Quality <= 0)
                 item.Quality = 0;
 
-            item.SellIn = item.SellIn - 1;
+            // Always decrease date by 1
+            item.SellIn--;
+        }
+
+        private bool ProcessSulfurasItem(Item item)
+        {
+            if (!item.Name.Equals(SulfurasItemName))
+                return false;
+
+            // "Sulfuras", being a legendary item, never has to be sold or decreases in Quality
+            return true;
+        }
+
+        private bool ProcessBrieItem(Item item)
+        {
+            // "Aged Brie" actually increases in Quality the older it gets
+            item.Quality++;
 
             return true;
         }
 
-        public bool ProcessClassicItem(Item item)
+        private bool ProcessBackstageItem(Item item)
         {
-            if (item.Quality > 0)
-            {
-                item.Quality = item.Quality - 1;
-            }
-
+            // "Backstage passes", like aged brie, increases in Quality as its SellIn value approaches;
+            // Quality increases by 2 when there are 10 days or less and by 3 when there are 5 days or less but
+            // Quality drops to 0 after the concert
+            
+            item.Quality++;
+            if (item.SellIn < 11)
+                item.Quality++;
+            if (item.SellIn < 6)
+                item.Quality++;
             if (item.SellIn <= 0)
-            {
-                if (item.Quality > 0)
-                {
-                    item.Quality = item.Quality - 1;
-                }
-            }
+                item.Quality = 0;
 
-            item.SellIn = item.SellIn - 1;
+            return true;
+        }
+
+        private bool ProcessConjuredItem(Item item)
+        {
+            // "Conjured" items degrade in Quality twice as fast as normal items
+            DegradeItem(item, 2);
+
+            return true;
+        }
+
+        private bool ProcessNormalItem(Item item)
+        {
+            DegradeItem(item, 1);
 
             return true;
         }
@@ -114,16 +99,23 @@ namespace GildedRoseKata
                 if (ProcessSulfurasItem(item))
                     continue;
 
-                if (ProcessBrieItem(item))
-                    continue;
+                switch (item.Name)
+                {
+                    case AgedBrieItemName:
+                        ProcessBrieItem(item);
+                        break;
+                    case BackstagePassesItemName:
+                        ProcessBackstageItem(item);
+                        break;
+                    case string ItemName when ItemName.StartsWith(ConjuredItemName):
+                        ProcessConjuredItem(item);
+                        break;
+                    default:
+                        ProcessNormalItem(item);
+                        break;
+                }
 
-                if (ProcessBackstageItem(item))
-                    continue;
-
-                if (ProcessConjuredItem(item))
-                    continue;
-
-                ProcessClassicItem(item);
+                ProcessCommonRules(item);
             }
         }
     }

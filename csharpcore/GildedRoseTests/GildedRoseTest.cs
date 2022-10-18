@@ -148,7 +148,7 @@ namespace GildedRoseTests
         }
 
         [Theory]
-        [InlineData("Conjured", 10, 10)]
+        [InlineData("Conjured Item", 10, 10)]
         public void UpdateQuality_ForConjuredItemsBeforeSellDate_QualityDecreaseTwice(string ItemName, int SellIn, int Quality)
         {
             IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
@@ -158,7 +158,7 @@ namespace GildedRoseTests
         }
 
         [Theory]
-        [InlineData("Conjured", 0, 10)]
+        [InlineData("Conjured Item", 0, 10)]
         public void UpdateQuality_ForConjuredItemsAfterSellDate_QualityDecreaseTwice(string ItemName, int SellIn, int Quality)
         {
             IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
