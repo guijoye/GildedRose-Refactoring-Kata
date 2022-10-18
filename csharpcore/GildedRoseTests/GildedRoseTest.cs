@@ -50,5 +50,15 @@ namespace GildedRoseTests
                 app.UpdateQuality();
             Assert.True(Items[0].Quality >= 0);
         }
+
+        [Theory]
+        [InlineData("Aged Brie", 10, 10)]
+        public void UpdateQuality_ForAgedBrie_QualityIncrease(string ItemName, int SellIn, int Quality)
+        {
+            IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
+            GildedRose app = new(Items);
+            app.UpdateQuality();
+            Assert.True(Items[0].Quality > Quality);
+        }
     }
 }
