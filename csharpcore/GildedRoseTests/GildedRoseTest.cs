@@ -37,5 +37,18 @@ namespace GildedRoseTests
             app.UpdateQuality();
             Assert.Equal(Quality  - 2, Items[0].Quality);
         }
+
+        [Theory]
+        [InlineData("TestItem", 10, 10, 100)]
+        [InlineData("TestItem", 0, 10, 100)]
+        [InlineData("TestItem", -5, 10, 100)]
+        public void UpdateQuality_UpdateManyTimes_QualityIsNeverNegative(string ItemName, int SellIn, int Quality, int Iterations)
+        {
+            IList<Item> Items = new List<Item> { new Item { Name = ItemName, SellIn = SellIn, Quality = Quality } };
+            GildedRose app = new(Items);
+            for (int x = 0; x < Iterations; x++)
+                app.UpdateQuality();
+            Assert.True(Items[0].Quality >= 0);
+        }
     }
 }
