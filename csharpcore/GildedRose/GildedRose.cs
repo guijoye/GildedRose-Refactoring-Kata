@@ -93,6 +93,9 @@ namespace GildedRoseKata
                 if (ProcessBackstageItem(item))
                     continue;
 
+                if (ProcessConjuredItem(item))
+                    continue;
+
                 if (item.Quality > 0)
                 {
                     item.Quality = item.Quality - 1;
