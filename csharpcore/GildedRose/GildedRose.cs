@@ -61,6 +61,25 @@ namespace GildedRoseKata
             return true;
         }
 
+        public bool ProcessConjuredItem(Item item)
+        {
+            if (!item.Name.StartsWith(ConjuredItemName))
+                return false;
+
+            if (item.SellIn > 0)
+                item.Quality = item.Quality - 2;
+            else
+                item.Quality = item.Quality - 4;
+
+            if (item.Quality < 0)
+                item.Quality = 0;
+
+            item.SellIn = item.SellIn - 1;
+
+            return true;
+        }
+
+
         public void UpdateQuality()
         {
             foreach (var item in Items)
@@ -72,6 +91,9 @@ namespace GildedRoseKata
                     continue;
 
                 if (ProcessBackstageItem(item))
+                    continue;
+
+                if (ProcessConjuredItem(item))
                     continue;
 
                 if (item.Quality > 0)
